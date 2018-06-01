@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.spatial import cKDTree
+from scipy.spatial import cKDTree, KDTree
 
 from .utils import spherical_to_cartesian
 
@@ -44,3 +44,33 @@ class KDSphere(object):
         dist_3d, ind = self.kdtree_.query(data_3d, k=k, eps=eps, **kwargs)
         dist_2d = 2 * np.arcsin(dist_3d * 0.5 / r)
         return dist_2d, ind
+
+    def query_ball_tree(self, data, r, **kwargs):
+        """ Query for matches within ``r`` radians
+
+        Parameters
+        ----------
+        data : Either a KDTree instance or array_like, shape (N, 2)
+            (lon, lat) pairs measured in radians, or another KDSphere (or KDTree)
+            instance
+        r : float
+            Search radius (radians)
+        **kwargs:
+            Additional arguments passed to scipy.spatial.cKDTree.query_ball_tree
+
+        Returns
+        -------
+        matches: list of lists
+            For each element ``self.data[i]`` of this tree, ``matches[i]`` is
+            a list of the indices of its neighbors in ``data``
+        """
+
+        other_kdtree = None
+        if isinstance(data, (cKDTree, KDTree)):
+            other_kdtree = data
+        elif isinstance(data, KDSphere):
+            other_kdtree = data.kdtree_
+        else:
+            other_kdtree = KDSphere(data).kdtree_
+
+        return self.kdtree_.query_ball_tree(other_kdtree, r, **kwargs)
