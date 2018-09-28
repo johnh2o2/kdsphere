@@ -74,3 +74,28 @@ class KDSphere(object):
             other_kdtree = KDSphere(data).kdtree_
 
         return self.kdtree_.query_ball_tree(other_kdtree, r, **kwargs)
+
+    def query_ball_point(self, data, r, **kwargs):
+        """ Query for all points within within ``r`` radians of ``data``.
+
+        Parameters
+        ----------
+        data : tuple or array_like, shape (N, 2)
+            (lon, lat) pair(s) measured in radians
+        r : float
+            Search radius (radians)
+        **kwargs:
+            Additional arguments passed to ``scipy.spatial.cKDTree.query_ball_point``
+
+        Returns
+        -------
+        matches: list or list of lists
+            If ``data`` is a single (lat, long) pair, ``matches`` is a list
+            of indices to neighbors within ``r`` radians. If ``data`` is a list
+            of (lat, long) pairs, ``matches`` is a list of lists, and
+            ``matches[i]`` is a list of the indices of neighbors within ``r``
+            radians from ``data[i]``.
+        """
+
+        data_3d = spherical_to_cartesian(data, return_radius=False)
+        return self.kdtree_.query_ball_point(data_3d, r, **kwargs)
