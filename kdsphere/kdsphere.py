@@ -101,4 +101,9 @@ class KDSphere(object):
         data_3d = spherical_to_cartesian(np.atleast_2d(data),
                                          return_radius=False)
 
-        return self.kdtree_.query_ball_point(data_3d, r, **kwargs)
+        results = self.kdtree_.query_ball_point(data_3d, r, **kwargs)
+
+        if np.atleast_2d(data).shape[0] == 1:
+            return results[0]
+
+        return results
