@@ -97,5 +97,8 @@ class KDSphere(object):
             radians from ``data[i]``.
         """
 
-        data_3d = spherical_to_cartesian(data, return_radius=False)
+
+        data_3d = spherical_to_cartesian(np.atleast_2d(data),
+                                         return_radius=False)
+
         return self.kdtree_.query_ball_point(data_3d, r, **kwargs)
